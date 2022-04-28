@@ -21,11 +21,13 @@ class HTMLElementTest extends TestCase
         return [
             "es array" => [
                 true,
-                ["hello"]
+                ["hello"],
+                "<p>hello</p>"
             ],
             "Exception: no es array" => [
                 false,
-                1234
+                1234,
+                ""
             ],
             "array con htmlelement" => [
                 true,
@@ -33,7 +35,8 @@ class HTMLElementTest extends TestCase
                     new HTMLElement("input"),
                     new HTMLElement("p"),
                     "hola"
-                ]
+                ],
+                "<p><input><p></p>hola</p>"
             ],
             "array con elemento invalido" => [
                 false,
@@ -41,13 +44,15 @@ class HTMLElementTest extends TestCase
                     new HTMLElement("input"),
                     new HTMLElement("p"),
                     1234
-                ]
+                ],
+                "<p></p>" // no añade nada, pues hay un elemento inválido
             ],
             "Empty: elemento vacío agrega contenido" => [
                 false,
                 [
                     "string"
-                ]
+                ],
+                "<img>"
             ]
         ];
     }
@@ -55,7 +60,7 @@ class HTMLElementTest extends TestCase
     /**
      * @dataProvider DPtestAddContent
      */
-    public function testAddContent($expected, $data)
+    public function testAddContent($expected, $data, $expectedHTML)
     {
         $prueba = new HTMLElement();
 
@@ -68,6 +73,7 @@ class HTMLElementTest extends TestCase
         }
 
         $this->assertEquals($expected, $prueba->addContent($data));
+        $this->assertEquals($expectedHTML, $prueba->getHTML());
     }
 
     public function testAddAttribute()
@@ -76,24 +82,31 @@ class HTMLElementTest extends TestCase
 
         $this->assertTrue($prueba->addAttribute("id", "parrafo"));
         $this->assertFalse($prueba->addAttribute("id", "parrafo"));
+        $this->assertEquals('<p id="parrafo"></p>', $prueba->getHTML());
 
         $this->assertTrue($prueba->addAttribute("data-counter", "3"));
+        $this->assertEquals('<p id="parrafo" data-counter="3"></p>', $prueba->getHTML());
 
         $this->assertFalse($prueba->addAttribute("src", "src no vale para atributo de p"));
+        $this->assertEquals('<p id="parrafo" data-counter="3"></p>', $prueba->getHTML());
 
         $prueba2 = new HTMLElement("a");
 
         $this->assertTrue($prueba2->addAttribute("target", "_blank"));
+        $this->assertEquals('<a target="_blank"></a>', $prueba2->getHTML());
 
         $prueba3 = new HTMLElement("a");
         $this->assertFalse($prueba3->addAttribute("target", "arbitrario"));
+        $this->assertEquals("<a></a>", $prueba3->getHTML());
     }
 
     public function testRemoveAttribute()
     {
         $prueba = new HTMLElement("p", ["id" => "parrafo"]);
 
+        $this->assertEquals('<p id="parrafo"></p>', $prueba->getHTML());
         $this->assertTrue($prueba->removeAttribute("id"));
+        $this->assertEquals('<p></p>', $prueba->getHTML());
         $this->assertFalse($prueba->removeAttribute("id"));
     }
 
@@ -120,6 +133,10 @@ class HTMLElementTest extends TestCase
         $prueba2->addAttribute("src", "imgurl");
         $this->assertEquals('<img src="imgurl">', $prueba2->getHTML());
 
+        $prueba2->removeAttribute("src");
+        $this->assertEquals('<img>', $prueba2->getHTML());
+
+        $prueba2->addAttribute("src", "imgurl");
         $prueba->addContent([$prueba2]);
         $this->assertEquals('<body id="body"><img src="imgurl"></body>', $prueba->getHTML());
 
