@@ -1,0 +1,30 @@
+{
+    "name": "kike/etiqueta-html",
+    "description": "Implementar una etiqueta HTML en PHP",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "src/HTMLElement.php"
+        ]
+    },
+    "autoload-dev": {
+        "files": [
+            "src/HTMLElement.php"
+        ],
+        "psr-4": {
+            "PHPUnit\\": "vendor/phpunit/phpunit/src",
+            "ITEC\\DAW\\EPL\\HTML\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Enrique Pavón",
+            "email": "91148468+eplq@users.noreply.github.com"
+        }
+    ],
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.6",
+        "phpunit/phpunit": "^9.5"
+    }
+}
